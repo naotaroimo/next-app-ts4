@@ -23,7 +23,7 @@ const SsrPeople =({people}:PeopleProps)=>{
 export default SsrPeople
 
 export const getServerSideProps:GetServerSideProps = async (ctx)=>{
-//    const cookie = ctx.req?.headers.cookie;
+   const cookie = ctx.req?.headers.cookie;
    
    const res = await fetch('http://localhost:3000/api/people',
        {
