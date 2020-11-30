@@ -3,6 +3,7 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { compare } from 'bcrypt';
 import {sign} from 'jsonwebtoken';
+import cookie from 'cookie';
 
 export default async function login(req:NextApiRequest,res:NextApiResponse){
 
@@ -24,29 +25,29 @@ export default async function login(req:NextApiRequest,res:NextApiResponse){
                person.password, 
                function(err,result){
                    if (!err && result){
-                    //    res.json(
-                    //        { message:'OK' }
-                    //        );
 
-                       //JWTのペイロード部分を設定
+                    //JWTのペイロード部分を設定
                        //予約語「sub」には一意に決まるものを入れたい⇒idを設定
                        //後はカスタム識別子に設定
                        const claims = {
                         sub:person.id,
                         myPersonName:person.name,
                         myPersonEmail:person.email,
-                        exp: Math.floor(Date.now() / 1000) + (60 * 60),
                     };
                     
                     //JWTを作成する（今回のsecretは適当にオンラインのサイトで生成したGUID/UUIDを設定）
-                    const jwt = sign(claims,'704d410c-e2c7-4de8-af06-06994e445d8e');
+                    const jwt = sign(claims,'704d410c-e2c7-4de8-af06-06994e445d8e',{ expiresIn: '1h' });
 
-                    //authTokenという名前つけてjsonを返却
-                    res.json(
-                        {
-                            authToken:jwt
-                        }
-                    );
+                       //レスポンスヘッダーにCookieをセット
+                       res.setHeader('Set-Cookie', cookie.serialize('auth', jwt, {
+                                httpOnly:true,
+                                secure: process.env.NODE_ENV !== 'development',
+                                sameSite:'strict',
+                                maxAge:3600,
+                                path:'/'
+                       }));
+
+                       res.json({message:'welcome !'});
 
                    }else{
                        //（パスワードが違う場合）メッセージ上は何かが間違ってる旨だけを伝える
