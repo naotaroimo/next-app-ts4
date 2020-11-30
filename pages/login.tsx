@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import Link from "next/link";
+import React, { useRef, useState } from "react";
 
 const Login = () => {
 
@@ -42,6 +43,12 @@ const Login = () => {
             <div>
                 {JSON.stringify(message, null, 4)}
             </div>
+            <div>
+                <Link href="./">
+                    <a>HOME</a>
+                </Link>
+            </div>
+
         </div>
     );
 }
